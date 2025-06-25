@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geometric Pattern Generator</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background-color: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .controls {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            display: flex;
+            gap: 1px;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            align-items: stretch;
+            height: 60px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        button {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.9);
+            border: none;
+            padding: 0 30px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #667eea;
+            transform: scaleX(0);
+            transition: transform 0.2s ease;
+        }
+        
+        button:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+        
+        button:hover::after {
+            transform: scaleX(1);
+        }
+        
+        button:active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .info {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            padding: 0 30px;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        #save-btn::after {
+            background: #f093fb;
+        }
+        
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 0 30px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .toggle-switch {
+            position: relative;
+            width: 40px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        
+        .toggle-switch.active {
+            background: #667eea;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            transition: transform 0.2s ease;
+        }
+        
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(20px);
+        }
+        
+        .toggle-label {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .seed-container {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            margin-left: auto;
+            padding-right: 30px;
+        }
+        
+        .seed-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            padding: 8px 0;
+            font-size: 13px;
+            width: 100px;
+            font-family: 'Monaco', 'Consolas', monospace;
+            transition: all 0.2s ease;
+            margin-right: 20px;
+        }
+        
+        .seed-input:focus {
+            outline: none;
+            border-bottom-color: #667eea;
+        }
+        
+        .seed-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .seed-btn {
+            background: transparent;
+            padding: 0 20px;
+            font-size: 13px;
+            border: none;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            height: 60px;
+            margin: 0;
+        }
+        
+        .seed-btn:first-of-type {
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .copy-feedback {
+            position: fixed;
+            top: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #667eea;
+            color: white;
+            padding: 10px 20px;
+            font-size: 13px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+    </style>
+</head>
+<body>
+    <div class="controls">
+        <div class="info">Press SPACE or click Generate</div>
+        <button id="generate-btn" onclick="generateNewPattern()">Generate New Pattern</button>
+        <button id="save-btn" onclick="savePattern()">Save Image</button>
+        <div class="toggle-container">
+            <span class="toggle-label">Transparent</span>
+            <div class="toggle-switch" id="transparent-toggle" onclick="toggleTransparency()">
+                <div class="toggle-slider"></div>
+            </div>
+        </div>
+        <div class="seed-container">
+            <input type="text" id="seed-input" class="seed-input" placeholder="Enter seed" onkeypress="handleSeedKeypress(event)">
+            <button class="seed-btn" onclick="copySeed()">Copy</button>
+            <button class="seed-btn" onclick="applySeed()">Apply</button>
+        </div>
+    </div>
+    
+    <div class="copy-feedback" id="copy-feedback">Seed copied!</div>
+    
+    <script>
+        let colorPalettes = [
+            // Sunset
+            ['#FF6B6B', '#FE7F2D', '#FCCA46', '#A1C181', '#619B8A', '#2E5266', '#6A4C93'],
+            // Ocean
+            ['#05668D', '#028090', '#00A896', '#02C39A', '#F0F3BD', '#FFE66D', '#FF6B6B'],
+            // Neon
+            ['#FF006E', '#FB5607', '#FFBE0B', '#8338EC', '#3A86FF', '#06FFB4', '#FF4365'],
+            // Pastel
+            ['#FFB5E8', '#FF9CEE', '#FFCCF9', '#FCC2FF', '#F6A6FF', '#B28DFF', '#C5A3FF'],
+            // Forest
+            ['#2D6A4F', '#40916C', '#52B788', '#74C69D', '#95D5B2', '#B7E4C7', '#D8F3DC'],
+            // Fire
+            ['#03071E', '#370617', '#6A040F', '#9D0208', '#D00000', '#DC2F02', '#E85D04'],
+            // Cyberpunk
+            ['#7209B7', '#560BAD', '#480CA8', '#3A0CA3', '#3F37C9', '#4361EE', '#4895EF']
+        ];
+        
+        let patterns = ['diagonal', 'horizontal', 'vertical', 'crosshatch', 'dots', 'waves', 'circles'];
+        let currentPalette;
+        let shapes = [];
+        let isTransparent = false;
+        let currentSeed = '';
+        let rng;
+        
+        function setup() {
+            createCanvas(windowWidth, windowHeight);
+            generateNewPattern();
+        }
+        
+        // Custom random number generator using seed
+        class SeededRandom {
+            constructor(seed) {
+                this.seed = this.hashCode(seed);
+            }
+            
+            hashCode(str) {
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) {
+                    const char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash = hash & hash; // Convert to 32-bit integer
+                }
+                return Math.abs(hash);
+            }
+            
+            next() {
+                const x = Math.sin(this.seed++) * 10000;
+                return x - Math.floor(x);
+            }
+            
+            random(min, max) {
+                if (min === undefined) return this.next();
+                if (max === undefined) return this.next() * min;
+                return min + this.next() * (max - min);
+            }
+            
+            randomInt(min, max) {
+                return Math.floor(this.random(min, max));
+            }
+            
+            choice(array) {
+                return array[this.randomInt(0, array.length)];
+            }
+        }
+        
+        function generateSeed() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let seed = '';
+            for (let i = 0; i < 8; i++) {
+                seed += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return seed;
+        }
+        
+        function toggleTransparency() {
+            isTransparent = !isTransparent;
+            document.getElementById('transparent-toggle').classList.toggle('active', isTransparent);
+            applySeed(); // Regenerate with same seed
+        }
+        
+        function generateNewPattern(seed = null) {
+            if (!seed) {
+                currentSeed = generateSeed();
+            } else {
+                currentSeed = seed;
+            }
+            
+            // Update seed input field
+            document.getElementById('seed-input').value = currentSeed;
+            
+            // Initialize seeded random generator
+            rng = new SeededRandom(currentSeed);
+            
+            if (isTransparent) {
+                clear();
+            } else {
+                background(20);
+            }
+            shapes = [];
+            
+            // Select color palette using seeded random
+            currentPalette = colorPalettes[rng.randomInt(0, colorPalettes.length)];
+            
+            // Generate random number of shapes (8-15)
+            let numShapes = rng.randomInt(8, 16);
+            
+            for (let i = 0; i < numShapes; i++) {
+                let shape = {
+                    x: rng.random(width * -0.2, width * 0.8),
+                    y: rng.random(height * -0.2, height * 0.8),
+                    w: rng.random(width * 0.2, width * 0.8),
+                    h: rng.random(height * 0.2, height * 0.8),
+                    col1: color(rng.choice(currentPalette) + '99'),
+                    col2: color(rng.choice(currentPalette) + '99'),
+                    angle: rng.random(-90, 90),
+                    spacing: rng.random(3, 8),
+                    pattern: rng.choice(patterns),
+                    strokeW: rng.random(1, 3)
+                };
+                shapes.push(shape);
+            }
+            
+            // Sort shapes by size (larger first) for better layering
+            shapes.sort((a, b) => (b.w * b.h) - (a.w * a.h));
+            
+            // Draw all shapes
+            for (let shape of shapes) {
+                drawLinePattern(shape);
+            }
+        }
+        
+        function copySeed() {
+            navigator.clipboard.writeText(currentSeed).then(() => {
+                // Show feedback
+                const feedback = document.getElementById('copy-feedback');
+                feedback.style.opacity = '1';
+                setTimeout(() => {
+                    feedback.style.opacity = '0';
+                }, 2000);
+            });
+        }
+        
+        function applySeed() {
+            const seedInput = document.getElementById('seed-input').value.trim();
+            if (seedInput) {
+                generateNewPattern(seedInput);
+            }
+        }
+        
+        function handleSeedKeypress(event) {
+            if (event.key === 'Enter') {
+                applySeed();
+            }
+        }
+        
+        function drawLinePattern(s) {
+            push();
+            
+            // Create clipping mask
+            drawingContext.save();
+            drawingContext.beginPath();
+            drawingContext.rect(s.x, s.y, s.w, s.h);
+            drawingContext.clip();
+            
+            // Apply rotation for angled patterns
+            translate(s.x + s.w/2, s.y + s.h/2);
+            rotate(radians(s.angle));
+            translate(-s.w/2, -s.h/2);
+            
+            strokeWeight(s.strokeW);
+            
+            if (s.pattern === 'diagonal' || s.pattern === 'horizontal' || s.pattern === 'vertical') {
+                // Draw parallel lines with gradient
+                for (let i = -max(s.w, s.h); i < max(s.w, s.h) * 2; i += s.spacing) {
+                    let inter = map(i, -max(s.w, s.h), max(s.w, s.h) * 2, 0, 1);
+                    let c = lerpColor(s.col1, s.col2, inter);
+                    stroke(c);
+                    
+                    if (s.pattern === 'horizontal' || s.pattern === 'diagonal') {
+                        line(-s.w, i, s.w * 2, i);
+                    } else {
+                        line(i, -s.h, i, s.h * 2);
+                    }
+                }
+            } else if (s.pattern === 'crosshatch') {
+                // Draw crosshatch pattern
+                for (let i = -max(s.w, s.h); i < max(s.w, s.h) * 2; i += s.spacing) {
+                    let inter = map(i, -max(s.w, s.h), max(s.w, s.h) * 2, 0, 1);
+                    let c = lerpColor(s.col1, s.col2, inter);
+                    stroke(c);
+                    
+                    line(-s.w, i, s.w * 2, i);
+                    line(i, -s.h, i, s.h * 2);
+                }
+            } else if (s.pattern === 'dots') {
+                // Draw dot pattern
+                noStroke();
+                for (let i = -s.w; i < s.w * 2; i += s.spacing * 2) {
+                    for (let j = -s.h; j < s.h * 2; j += s.spacing * 2) {
+                        let inter = map(i + j, -s.w - s.h, s.w * 2 + s.h * 2, 0, 1);
+                        let c = lerpColor(s.col1, s.col2, inter);
+                        fill(c);
+                        circle(i, j, s.spacing * 0.8);
+                    }
+                }
+            } else if (s.pattern === 'waves') {
+                // Draw wavy lines
+                for (let i = -max(s.w, s.h); i < max(s.w, s.h) * 2; i += s.spacing) {
+                    let inter = map(i, -max(s.w, s.h), max(s.w, s.h) * 2, 0, 1);
+                    let c = lerpColor(s.col1, s.col2, inter);
+                    stroke(c);
+                    noFill();
+                    
+                    beginShape();
+                    for (let x = -s.w; x < s.w * 2; x += 5) {
+                        let y = i + sin(x * 0.02 + s.angle) * s.spacing * 2;
+                        vertex(x, y);
+                    }
+                    endShape();
+                }
+            } else if (s.pattern === 'circles') {
+                // Draw concentric circles
+                noFill();
+                for (let i = s.spacing; i < max(s.w, s.h) * 2; i += s.spacing * 2) {
+                    let inter = map(i, 0, max(s.w, s.h) * 2, 0, 1);
+                    let c = lerpColor(s.col1, s.col2, inter);
+                    stroke(c);
+                    circle(0, 0, i * 2);
+                }
+            }
+            
+            drawingContext.restore();
+            pop();
+        }
+        
+        function keyPressed() {
+            if (key === ' ') {
+                generateNewPattern();
+                return false; // Prevent default behavior
+            }
+        }
+        
+        function savePattern() {
+            let timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
+            saveCanvas(`geometric-pattern-${timestamp}`, 'png');
+        }
+        
+        function windowResized() {
+            resizeCanvas(windowWidth, windowHeight);
+            generateNewPattern();
+        }
+    </script>
+</body>
+</html>
