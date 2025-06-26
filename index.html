@@ -1,210 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Geometric Pattern Generator</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden;
-            background-color: #000;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        }
-        
-        .controls {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            z-index: 100;
-            display: flex;
-            gap: 1px;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(20px);
-            align-items: stretch;
-            height: 60px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        button {
-            background: transparent;
-            color: rgba(255, 255, 255, 0.9);
-            border: none;
-            padding: 0 30px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        button::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: #667eea;
-            transform: scaleX(0);
-            transition: transform 0.2s ease;
-        }
-        
-        button:hover {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-        }
-        
-        button:hover::after {
-            transform: scaleX(1);
-        }
-        
-        button:active {
-            background: rgba(255, 255, 255, 0.1);
-        }
-        
-        .info {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 13px;
-            display: flex;
-            align-items: center;
-            padding: 0 30px;
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        #save-btn::after {
-            background: #f093fb;
-        }
-        
-        .toggle-container {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 0 30px;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .toggle-switch {
-            position: relative;
-            width: 40px;
-            height: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-        
-        .toggle-switch.active {
-            background: #667eea;
-        }
-        
-        .toggle-slider {
-            position: absolute;
-            top: 2px;
-            left: 2px;
-            width: 16px;
-            height: 16px;
-            background: white;
-            transition: transform 0.2s ease;
-        }
-        
-        .toggle-switch.active .toggle-slider {
-            transform: translateX(20px);
-        }
-        
-        .toggle-label {
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 13px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .seed-container {
-            display: flex;
-            align-items: center;
-            gap: 0;
-            margin-left: auto;
-            padding-right: 30px;
-        }
-        
-        .seed-input {
-            background: transparent;
-            border: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-            color: rgba(255, 255, 255, 0.9);
-            padding: 8px 0;
-            font-size: 13px;
-            width: 100px;
-            font-family: 'Monaco', 'Consolas', monospace;
-            transition: all 0.2s ease;
-            margin-right: 20px;
-        }
-        
-        .seed-input:focus {
-            outline: none;
-            border-bottom-color: #667eea;
-        }
-        
-        .seed-input::placeholder {
-            color: rgba(255, 255, 255, 0.3);
-        }
-        
-        .seed-btn {
-            background: transparent;
-            padding: 0 20px;
-            font-size: 13px;
-            border: none;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            height: 60px;
-            margin: 0;
-        }
-        
-        .seed-btn:first-of-type {
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .copy-feedback {
-            position: fixed;
-            top: 70px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #667eea;
-            color: white;
-            padding: 10px 20px;
-            font-size: 13px;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-            pointer-events: none;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Geometric Pattern Generator</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background-color: #000;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    .controls {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1px;
+      height: 60px;
+      padding: 0 10px;
+      background: rgba(0, 0, 0, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    /* Buttons */
+    button {
+      background: transparent;
+      color: rgba(255,255,255,0.9);
+      border: none;
+      padding: 0 20px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      position: relative;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    button::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #667eea;
+      transform: scaleX(0);
+      transition: transform 0.2s;
+    }
+    button:hover {
+      background: rgba(255,255,255,0.05);
+      color: #fff;
+    }
+    button:hover::after { transform: scaleX(1); }
+    button:active { background: rgba(255,255,255,0.1); }
+
+    .info {
+      color: rgba(255,255,255,0.5);
+      font-size: 13px;
+      padding: 0 15px;
+      border-right: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .toggle-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 0 15px;
+      border-left: 1px solid rgba(255,255,255,0.1);
+      flex-shrink: 0;
+    }
+    .toggle-label {
+      color: rgba(255,255,255,0.9);
+      font-size: 13px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .toggle-switch {
+      position: relative;
+      width: 40px;
+      height: 20px;
+      background: rgba(255,255,255,0.2);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle-switch.active { background: #667eea; }
+    .toggle-slider {
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 16px;
+      height: 16px;
+      background: #fff;
+      transition: transform 0.2s;
+    }
+    .toggle-switch.active .toggle-slider { transform: translateX(20px); }
+
+    .seed-container {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      margin: 0 10px;
+      flex-shrink: 0;
+    }
+    .seed-input {
+      background: transparent;
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      color: rgba(255,255,255,0.9);
+      font-size: 13px;
+      padding: 6px 4px;
+      width: 80px;
+      font-family: 'Monaco','Consolas',monospace;
+      transition: all 0.2s;
+    }
+    .seed-input:focus { outline: none; border-bottom-color: #667eea; }
+    .seed-input::placeholder { color: rgba(255,255,255,0.3); }
+    .seed-btn {
+      background: transparent;
+      padding: 0 10px;
+      font-size: 13px;
+      border: none;
+      border-left: 1px solid rgba(255,255,255,0.1);
+      height: 60px;
+      margin: 0;
+      flex-shrink: 0;
+    }
+
+    /* GitHub link styling */
+    .github-link {
+      margin-left: auto;
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 0 20px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s;
+    }
+    .github-link:hover { color: #667eea; }
+
+    .copy-feedback {
+      position: fixed;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #667eea;
+      color: #fff;
+      padding: 10px 20px;
+      font-size: 13px;
+      opacity: 0;
+      transition: opacity 0.2s;
+      pointer-events: none;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 600px) {
+      .controls {
+        flex-direction: column;
+        align-items: flex-start;
+        height: auto;
+        padding: 5px;
+      }
+      /* hide info text and seed controls on mobile */
+      .info,
+      .seed-container {
+        display: none;
+      }
+      button, .github-link, .toggle-label {
+        font-size: 12px;
+        padding: 8px 10px;
+      }
+      .seed-input { width: 60px; font-size: 12px; padding: 4px 2px; }
+      .seed-btn { padding: 0 8px; font-size: 12px; }
+      .toggle-container {
+        width: 100%;
+        justify-content: flex-start;
+        border: none;
+        padding: 5px 0;
+      }
+      .toggle-container, .github-link {
+        border: none;
+        margin: 2px 0;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="controls">
-        <div class="info">Press SPACE or click Generate</div>
-        <button id="generate-btn" onclick="generateNewPattern()">Generate New Pattern</button>
-        <button id="save-btn" onclick="savePattern()">Save Image</button>
-        <div class="toggle-container">
-            <span class="toggle-label">Transparent</span>
-            <div class="toggle-switch" id="transparent-toggle" onclick="toggleTransparency()">
-                <div class="toggle-slider"></div>
-            </div>
-        </div>
-        <div class="seed-container">
-            <input type="text" id="seed-input" class="seed-input" placeholder="Enter seed" onkeypress="handleSeedKeypress(event)">
-            <button class="seed-btn" onclick="copySeed()">Copy</button>
-            <button class="seed-btn" onclick="applySeed()">Apply</button>
-        </div>
+  <div class="controls">
+    <div class="info">Press SPACE or click Generate</div>
+    <button id="generate-btn" onclick="generateNewPattern()">Generate New Pattern</button>
+    <button id="save-btn" onclick="savePattern()">Save Image</button>
+    <div class="toggle-container">
+      <span class="toggle-label">Transparent</span>
+      <div class="toggle-switch" id="transparent-toggle" onclick="toggleTransparency()">
+        <div class="toggle-slider"></div>
+      </div>
     </div>
-    
-    <div class="copy-feedback" id="copy-feedback">Seed copied!</div>
-    
+    <div class="seed-container">
+      <input type="text" id="seed-input" class="seed-input" placeholder="Enter seed" onkeypress="handleSeedKeypress(event)">
+      <button class="seed-btn" onclick="copySeed()">Copy</button>
+      <button class="seed-btn" onclick="applySeed()">Apply</button>
+    </div>
+    <a href="https://github.com/pxl-pshr/geometric-pattern-generator" target="_blank" rel="noopener" class="github-link">GitHub</a>
+  </div>
+  <div class="copy-feedback" id="copy-feedback">Seed copied!</div>
+
     <script>
         let colorPalettes = [
             // Sunset
@@ -231,7 +250,22 @@
         let rng;
         
         function setup() {
+            // Check if mobile and adjust canvas position
+            const isMobile = window.innerWidth <= 768;
+            const navHeight = isMobile ? 100 : 60; // Approximate height of mobile nav
+            
             createCanvas(windowWidth, windowHeight);
+            
+            // Add canvas styling for mobile
+            const canvas = document.querySelector('canvas');
+            if (canvas) {
+                canvas.style.position = 'fixed';
+                canvas.style.top = '0';
+                canvas.style.left = '0';
+                canvas.style.width = '100%';
+                canvas.style.height = '100%';
+            }
+            
             generateNewPattern();
         }
         
