@@ -4,493 +4,123 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Geometric Pattern Generator</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background-color: #000;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    }
-
-    .controls {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1px;
-      height: 60px;
-      padding: 0 10px;
-      background: rgba(0, 0, 0, 0.95);
-      backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255,255,255,0.1);
-    }
-
-    /* Buttons */
-    button {
-      background: transparent;
-      color: rgba(255,255,255,0.9);
-      border: none;
-      padding: 0 20px;
-      font-size: 14px;
-      font-weight: 500;
-      cursor: pointer;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      position: relative;
-      transition: all 0.2s;
-      flex-shrink: 0;
-    }
-    button::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: #667eea;
-      transform: scaleX(0);
-      transition: transform 0.2s;
-    }
-    button:hover {
-      background: rgba(255,255,255,0.05);
-      color: #fff;
-    }
-    button:hover::after { transform: scaleX(1); }
-    button:active { background: rgba(255,255,255,0.1); }
-
-    .info {
-      color: rgba(255,255,255,0.5);
-      font-size: 13px;
-      padding: 0 15px;
-      border-right: 1px solid rgba(255,255,255,0.1);
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-    }
-
-    .toggle-container {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 0 15px;
-      border-left: 1px solid rgba(255,255,255,0.1);
-      flex-shrink: 0;
-    }
-    .toggle-label {
-      color: rgba(255,255,255,0.9);
-      font-size: 13px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-    .toggle-switch {
-      position: relative;
-      width: 40px;
-      height: 20px;
-      background: rgba(255,255,255,0.2);
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-    .toggle-switch.active { background: #667eea; }
-    .toggle-slider {
-      position: absolute;
-      top: 2px;
-      left: 2px;
-      width: 16px;
-      height: 16px;
-      background: #fff;
-      transition: transform 0.2s;
-    }
-    .toggle-switch.active .toggle-slider { transform: translateX(20px); }
-
-    .seed-container {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      margin: 0 10px;
-      flex-shrink: 0;
-    }
-    .seed-input {
-      background: transparent;
-      border: none;
-      border-bottom: 1px solid rgba(255,255,255,0.2);
-      color: rgba(255,255,255,0.9);
-      font-size: 13px;
-      padding: 6px 4px;
-      width: 80px;
-      font-family: 'Monaco','Consolas',monospace;
-      transition: all 0.2s;
-    }
-    .seed-input:focus { outline: none; border-bottom-color: #667eea; }
-    .seed-input::placeholder { color: rgba(255,255,255,0.3); }
-    .seed-btn {
-      background: transparent;
-      padding: 0 10px;
-      font-size: 13px;
-      border: none;
-      border-left: 1px solid rgba(255,255,255,0.1);
-      height: 60px;
-      margin: 0;
-      flex-shrink: 0;
-    }
-
-    /* GitHub link styling */
-    .github-link {
-      margin-left: auto;
-      color: rgba(255,255,255,0.9);
-      text-decoration: none;
-      font-size: 14px;
-      font-weight: 500;
-      padding: 0 20px;
-      flex-shrink: 0;
-      display: flex;
-      align-items: center;
-      transition: color 0.2s;
-    }
-    .github-link:hover { color: #667eea; }
-
-    .copy-feedback {
-      position: fixed;
-      top: 70px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: #667eea;
-      color: #fff;
-      padding: 10px 20px;
-      font-size: 13px;
-      opacity: 0;
-      transition: opacity 0.2s;
-      pointer-events: none;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    /* Mobile adjustments */
-    @media (max-width: 600px) {
-      .controls {
-        flex-direction: column;
-        align-items: flex-start;
-        height: auto;
-        padding: 5px;
-      }
-      /* hide info text and seed controls on mobile */
-      .info,
-      .seed-container {
-        display: none;
-      }
-      button, .github-link, .toggle-label {
-        font-size: 12px;
-        padding: 8px 10px;
-      }
-      .seed-input { width: 60px; font-size: 12px; padding: 4px 2px; }
-      .seed-btn { padding: 0 8px; font-size: 12px; }
-      .toggle-container {
-        width: 100%;
-        justify-content: flex-start;
-        border: none;
-        padding: 5px 0;
-      }
-      .toggle-container, .github-link {
-        border: none;
-        margin: 2px 0;
-      }
-    }
-  </style>
+  <meta name="description" content="Generate seeded geometric line-texture patterns. Share them by link, export PNG or SVG at any size.">
+  <meta name="theme-color" content="#000000">
+  <meta property="og:title" content="Geometric Pattern Generator">
+  <meta property="og:description" content="Seeded geometric line-texture patterns. Share by link, export PNG or SVG.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://pxl-pshr.github.io/geometric-pattern-generator/">
+  <meta property="og:image" content="https://i.postimg.cc/m22DyR4q/download-7.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23141414'/%3E%3Cg stroke-width='3' stroke-opacity='.8'%3E%3Cpath d='M-2 14 14-2M-2 22 22-2' stroke='%23FF6B6B'/%3E%3Cpath d='M10 34 34 10M18 34 34 18' stroke='%233A86FF'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="controls">
-    <div class="info">Press SPACE or click Generate</div>
-    <button id="generate-btn" onclick="generateNewPattern()">Generate New Pattern</button>
-    <button id="save-btn" onclick="savePattern()">Save Image</button>
-    <div class="toggle-container">
-      <span class="toggle-label">Transparent</span>
-      <div class="toggle-switch" id="transparent-toggle" onclick="toggleTransparency()">
-        <div class="toggle-slider"></div>
-      </div>
+  <header class="toolbar">
+    <div class="tb-group tb-main">
+      <button type="button" id="prev-btn" class="icon-btn" aria-label="Previous pattern" title="Previous pattern (←)" disabled>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg>
+      </button>
+      <button type="button" id="next-btn" class="icon-btn" aria-label="Next pattern" title="Next pattern (→)" disabled>
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m6 3 5 5-5 5"/></svg>
+      </button>
+      <button type="button" id="generate-btn" class="generate-btn" title="New pattern (Space)">Generate</button>
     </div>
-    <div class="seed-container">
-      <input type="text" id="seed-input" class="seed-input" placeholder="Enter seed" onkeypress="handleSeedKeypress(event)">
-      <button class="seed-btn" onclick="copySeed()">Copy</button>
-      <button class="seed-btn" onclick="applySeed()">Apply</button>
-    </div>
-    <a href="https://github.com/pxl-pshr/geometric-pattern-generator" target="_blank" rel="noopener" class="github-link">GitHub</a>
-  </div>
-  <div class="copy-feedback" id="copy-feedback">Seed copied!</div>
 
-    <script>
-        let colorPalettes = [
-            // Sunset
-            ['#FF6B6B', '#FE7F2D', '#FCCA46', '#A1C181', '#619B8A', '#2E5266', '#6A4C93'],
-            // Ocean
-            ['#05668D', '#028090', '#00A896', '#02C39A', '#F0F3BD', '#FFE66D', '#FF6B6B'],
-            // Neon
-            ['#FF006E', '#FB5607', '#FFBE0B', '#8338EC', '#3A86FF', '#06FFB4', '#FF4365'],
-            // Pastel
-            ['#FFB5E8', '#FF9CEE', '#FFCCF9', '#FCC2FF', '#F6A6FF', '#B28DFF', '#C5A3FF'],
-            // Forest
-            ['#2D6A4F', '#40916C', '#52B788', '#74C69D', '#95D5B2', '#B7E4C7', '#D8F3DC'],
-            // Fire
-            ['#03071E', '#370617', '#6A040F', '#9D0208', '#D00000', '#DC2F02', '#E85D04'],
-            // Cyberpunk
-            ['#7209B7', '#560BAD', '#480CA8', '#3A0CA3', '#3F37C9', '#4361EE', '#4895EF']
-        ];
-        
-        let patterns = ['diagonal', 'horizontal', 'vertical', 'crosshatch', 'dots', 'waves', 'circles'];
-        let currentPalette;
-        let shapes = [];
-        let isTransparent = false;
-        let currentSeed = '';
-        let rng;
-        
-        function setup() {
-            // Check if mobile and adjust canvas position
-            const isMobile = window.innerWidth <= 768;
-            const navHeight = isMobile ? 100 : 60; // Approximate height of mobile nav
-            
-            createCanvas(windowWidth, windowHeight);
-            
-            // Add canvas styling for mobile
-            const canvas = document.querySelector('canvas');
-            if (canvas) {
-                canvas.style.position = 'fixed';
-                canvas.style.top = '0';
-                canvas.style.left = '0';
-                canvas.style.width = '100%';
-                canvas.style.height = '100%';
-            }
-            
-            generateNewPattern();
-        }
-        
-        // Custom random number generator using seed
-        class SeededRandom {
-            constructor(seed) {
-                this.seed = this.hashCode(seed);
-            }
-            
-            hashCode(str) {
-                let hash = 0;
-                for (let i = 0; i < str.length; i++) {
-                    const char = str.charCodeAt(i);
-                    hash = ((hash << 5) - hash) + char;
-                    hash = hash & hash; // Convert to 32-bit integer
-                }
-                return Math.abs(hash);
-            }
-            
-            next() {
-                const x = Math.sin(this.seed++) * 10000;
-                return x - Math.floor(x);
-            }
-            
-            random(min, max) {
-                if (min === undefined) return this.next();
-                if (max === undefined) return this.next() * min;
-                return min + this.next() * (max - min);
-            }
-            
-            randomInt(min, max) {
-                return Math.floor(this.random(min, max));
-            }
-            
-            choice(array) {
-                return array[this.randomInt(0, array.length)];
-            }
-        }
-        
-        function generateSeed() {
-            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-            let seed = '';
-            for (let i = 0; i < 8; i++) {
-                seed += chars.charAt(Math.floor(Math.random() * chars.length));
-            }
-            return seed;
-        }
-        
-        function toggleTransparency() {
-            isTransparent = !isTransparent;
-            document.getElementById('transparent-toggle').classList.toggle('active', isTransparent);
-            applySeed(); // Regenerate with same seed
-        }
-        
-        function generateNewPattern(seed = null) {
-            if (!seed) {
-                currentSeed = generateSeed();
-            } else {
-                currentSeed = seed;
-            }
-            
-            // Update seed input field
-            document.getElementById('seed-input').value = currentSeed;
-            
-            // Initialize seeded random generator
-            rng = new SeededRandom(currentSeed);
-            
-            if (isTransparent) {
-                clear();
-            } else {
-                background(20);
-            }
-            shapes = [];
-            
-            // Select color palette using seeded random
-            currentPalette = colorPalettes[rng.randomInt(0, colorPalettes.length)];
-            
-            // Generate random number of shapes (8-15)
-            let numShapes = rng.randomInt(8, 16);
-            
-            for (let i = 0; i < numShapes; i++) {
-                let shape = {
-                    x: rng.random(width * -0.2, width * 0.8),
-                    y: rng.random(height * -0.2, height * 0.8),
-                    w: rng.random(width * 0.2, width * 0.8),
-                    h: rng.random(height * 0.2, height * 0.8),
-                    col1: color(rng.choice(currentPalette) + '99'),
-                    col2: color(rng.choice(currentPalette) + '99'),
-                    angle: rng.random(-90, 90),
-                    spacing: rng.random(3, 8),
-                    pattern: rng.choice(patterns),
-                    strokeW: rng.random(1, 3)
-                };
-                shapes.push(shape);
-            }
-            
-            // Sort shapes by size (larger first) for better layering
-            shapes.sort((a, b) => (b.w * b.h) - (a.w * a.h));
-            
-            // Draw all shapes
-            for (let shape of shapes) {
-                drawLinePattern(shape);
-            }
-        }
-        
-        function copySeed() {
-            navigator.clipboard.writeText(currentSeed).then(() => {
-                // Show feedback
-                const feedback = document.getElementById('copy-feedback');
-                feedback.style.opacity = '1';
-                setTimeout(() => {
-                    feedback.style.opacity = '0';
-                }, 2000);
-            });
-        }
-        
-        function applySeed() {
-            const seedInput = document.getElementById('seed-input').value.trim();
-            if (seedInput) {
-                generateNewPattern(seedInput);
-            }
-        }
-        
-        function handleSeedKeypress(event) {
-            if (event.key === 'Enter') {
-                applySeed();
-            }
-        }
-        
-        function drawLinePattern(s) {
-            push();
-            
-            // Create clipping mask
-            drawingContext.save();
-            drawingContext.beginPath();
-            drawingContext.rect(s.x, s.y, s.w, s.h);
-            drawingContext.clip();
-            
-            // Apply rotation for angled patterns
-            translate(s.x + s.w/2, s.y + s.h/2);
-            rotate(radians(s.angle));
-            translate(-s.w/2, -s.h/2);
-            
-            strokeWeight(s.strokeW);
-            
-            if (s.pattern === 'diagonal' || s.pattern === 'horizontal' || s.pattern === 'vertical') {
-                // Draw parallel lines with gradient
-                for (let i = -max(s.w, s.h); i < max(s.w, s.h) * 2; i += s.spacing) {
-                    let inter = map(i, -max(s.w, s.h), max(s.w, s.h) * 2, 0, 1);
-                    let c = lerpColor(s.col1, s.col2, inter);
-                    stroke(c);
-                    
-                    if (s.pattern === 'horizontal' || s.pattern === 'diagonal') {
-                        line(-s.w, i, s.w * 2, i);
-                    } else {
-                        line(i, -s.h, i, s.h * 2);
-                    }
-                }
-            } else if (s.pattern === 'crosshatch') {
-                // Draw crosshatch pattern
-                for (let i = -max(s.w, s.h); i < max(s.w, s.h) * 2; i += s.spacing) {
-                    let inter = map(i, -max(s.w, s.h), max(s.w, s.h) * 2, 0, 1);
-                    let c = lerpColor(s.col1, s.col2, inter);
-                    stroke(c);
-                    
-                    line(-s.w, i, s.w * 2, i);
-                    line(i, -s.h, i, s.h * 2);
-                }
-            } else if (s.pattern === 'dots') {
-                // Draw dot pattern
-                noStroke();
-                for (let i = -s.w; i < s.w * 2; i += s.spacing * 2) {
-                    for (let j = -s.h; j < s.h * 2; j += s.spacing * 2) {
-                        let inter = map(i + j, -s.w - s.h, s.w * 2 + s.h * 2, 0, 1);
-                        let c = lerpColor(s.col1, s.col2, inter);
-                        fill(c);
-                        circle(i, j, s.spacing * 0.8);
-                    }
-                }
-            } else if (s.pattern === 'waves') {
-                // Draw wavy lines
-                for (let i = -max(s.w, s.h); i < max(s.w, s.h) * 2; i += s.spacing) {
-                    let inter = map(i, -max(s.w, s.h), max(s.w, s.h) * 2, 0, 1);
-                    let c = lerpColor(s.col1, s.col2, inter);
-                    stroke(c);
-                    noFill();
-                    
-                    beginShape();
-                    for (let x = -s.w; x < s.w * 2; x += 5) {
-                        let y = i + sin(x * 0.02 + s.angle) * s.spacing * 2;
-                        vertex(x, y);
-                    }
-                    endShape();
-                }
-            } else if (s.pattern === 'circles') {
-                // Draw concentric circles
-                noFill();
-                for (let i = s.spacing; i < max(s.w, s.h) * 2; i += s.spacing * 2) {
-                    let inter = map(i, 0, max(s.w, s.h) * 2, 0, 1);
-                    let c = lerpColor(s.col1, s.col2, inter);
-                    stroke(c);
-                    circle(0, 0, i * 2);
-                }
-            }
-            
-            drawingContext.restore();
-            pop();
-        }
-        
-        function keyPressed() {
-            if (key === ' ') {
-                generateNewPattern();
-                return false; // Prevent default behavior
-            }
-        }
-        
-        function savePattern() {
-            let timestamp = new Date().toISOString().slice(0, 19).replace(/:/g, '-');
-            saveCanvas(`geometric-pattern-${timestamp}`, 'png');
-        }
-        
-        function windowResized() {
-            resizeCanvas(windowWidth, windowHeight);
-            generateNewPattern();
-        }
-    </script>
+    <form class="tb-group tb-seed" id="seed-form" autocomplete="off">
+      <label for="seed-input" class="visually-hidden">Seed</label>
+      <input type="text" id="seed-input" class="seed-input" placeholder="Enter seed" maxlength="64" spellcheck="false" autocapitalize="off" enterkeyhint="go">
+      <button type="submit" class="seed-btn">Apply</button>
+      <button type="button" id="copy-link-btn" class="seed-btn" title="Copy a link to this exact pattern (C)">Copy link</button>
+    </form>
+
+    <div class="tb-group tb-actions">
+      <button type="button" id="options-btn" aria-expanded="false" aria-controls="options-panel" title="Options (O)">Options</button>
+      <button type="button" id="save-png-btn" title="Save PNG (S)"><span class="wide-only">Save&nbsp;</span>PNG</button>
+      <button type="button" id="save-svg-btn" title="Save SVG (V)"><span class="wide-only">Save&nbsp;</span>SVG</button>
+      <a href="https://github.com/pxl-pshr/geometric-pattern-generator" target="_blank" rel="noopener" class="github-link wide-only">GitHub</a>
+    </div>
+  </header>
+
+  <div class="workspace">
+    <main class="stage" id="stage">
+      <canvas id="canvas" role="img" aria-label="Generated geometric pattern"></canvas>
+    </main>
+
+    <aside class="panel" id="options-panel" aria-label="Options" hidden>
+      <div class="panel-head">
+        <p class="panel-summary" id="summary"></p>
+        <button type="button" class="close-btn" id="close-options-btn" aria-label="Close options">
+          <svg viewBox="0 0 16 16" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8"/></svg>
+        </button>
+      </div>
+
+      <section>
+        <h2>Format</h2>
+        <div class="chips" id="format-chips"></div>
+        <div class="custom-size" id="custom-size" hidden>
+          <label>W <input type="number" id="custom-width" min="64" max="8192" step="1" inputmode="numeric"></label>
+          <span aria-hidden="true">×</span>
+          <label>H <input type="number" id="custom-height" min="64" max="8192" step="1" inputmode="numeric"></label>
+        </div>
+      </section>
+
+      <section>
+        <h2>Palette</h2>
+        <div class="palettes" id="palette-list"></div>
+      </section>
+
+      <section>
+        <h2>Styles</h2>
+        <div class="chips" id="style-chips"></div>
+      </section>
+
+      <section>
+        <h2>Background</h2>
+        <div class="chips" id="background-chips">
+          <button type="button" class="chip" data-bg="dark">Dark</button>
+          <button type="button" class="chip" data-bg="light">Light</button>
+          <button type="button" class="chip" data-bg="transparent">Transparent</button>
+          <label class="chip color-chip" id="custom-bg-chip">
+            <input type="color" id="custom-bg" value="#1b1f3b" aria-label="Custom background colour">
+            Custom
+          </label>
+        </div>
+      </section>
+
+      <section>
+        <h2><label for="texture-range">Texture scale</label> <output id="texture-value" for="texture-range">1×</output></h2>
+        <input type="range" id="texture-range" min="0.5" max="3" step="0.25" value="1">
+      </section>
+
+      <section>
+        <h2>Export resolution</h2>
+        <div class="chips" id="export-chips"></div>
+        <p class="hint" id="export-hint"></p>
+      </section>
+
+      <section>
+        <h2>Shortcuts</h2>
+        <dl class="shortcuts">
+          <dt><kbd>Space</kbd></dt><dd>New pattern</dd>
+          <dt><kbd>←</kbd> <kbd>→</kbd></dt><dd>Previous / next</dd>
+          <dt><kbd>S</kbd> <kbd>V</kbd></dt><dd>Save PNG / SVG</dd>
+          <dt><kbd>C</kbd></dt><dd>Copy link</dd>
+          <dt><kbd>T</kbd></dt><dd>Toggle transparent</dd>
+          <dt><kbd>O</kbd></dt><dd>Options</dd>
+        </dl>
+      </section>
+
+      <div class="panel-foot">
+        <button type="button" class="text-btn" id="reset-btn">Reset options</button>
+        <a href="https://github.com/pxl-pshr/geometric-pattern-generator" target="_blank" rel="noopener" class="text-btn">GitHub</a>
+      </div>
+    </aside>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="src/generator.js"></script>
+  <script src="src/app.js"></script>
 </body>
 </html>
