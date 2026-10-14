@@ -1,0 +1,11 @@
+{
+  "name": "geometric-pattern-generator",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Seeded geometric line-texture pattern generator",
+  "license": "MIT",
+  "scripts": {
+    "start": "npx --yes serve .",
+    "test": "node --test"
+  }
+}
